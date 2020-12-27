@@ -1,6 +1,0 @@
-.env
-env/
-.DS_Store
-*.pyc
-*.sh
-
