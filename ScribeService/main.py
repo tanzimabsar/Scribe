@@ -38,7 +38,7 @@ def get_db():
         db.close()
 
 
-async def get_current_user(
+def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
     credentials_exception = HTTPException(
@@ -86,7 +86,11 @@ async def login(
         data = {"username": form_data.username}
 
         token, expire = crud.create_access_token(data=data)
-        return {"jwt_token": token, "token_type": "bearer", "expires": expire}
+        return {
+            "jwt_token": token, 
+            "token_type": "bearer",
+            "refresh_token": "random_string",
+             "expires": expire}
 
     else:
         raise HTTPException(
@@ -106,6 +110,11 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
 
+@app.get("/refresh_token")
+async def get_refresh_token(refresh_token: str):
+    """ Take an existing refresh token for a new JWT token, client stores refresh token """
+    pass
+
 
 @app.get("/licenses/")
 def get_licenses(
@@ -118,6 +127,8 @@ def get_licenses(
 def create_license(
     license: schemas.LicenseCreate,
     db: Session = Depends(get_db),
-    token: str = Depends(get_current_user),
-):
-    return crud.create_license(db=db, license=license)
+    current_user: schemas.User = Depends(get_current_user),
+    token: str = Depends(get_current_user)):
+
+    return crud.create_license(db=db, license=license, current_user=current_user)
+

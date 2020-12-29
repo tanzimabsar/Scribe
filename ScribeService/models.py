@@ -33,7 +33,7 @@ class License(Base):
     license_start = Column(Date)
     license_end = Column(Date, index=True)
     license_duration = Column(Integer)
-    license_owner = Column(Integer, ForeignKey("users.id"))
+    license_owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="licenses")
 

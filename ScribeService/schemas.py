@@ -14,6 +14,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+    email: str
     date_joined: date
 
     class Config:
@@ -27,7 +28,7 @@ class License(BaseModel):
     license_start: date
     license_end: date
     license_duration: int
-    license_owner: int
+    license_owner_id: int
 
 
 class LicenseCreate(BaseModel):
@@ -35,4 +36,3 @@ class LicenseCreate(BaseModel):
     title: str
     license_start: str
     license_end: str
-    user_id: int
