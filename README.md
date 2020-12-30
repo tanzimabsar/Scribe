@@ -2,8 +2,4 @@
 
 Simple CRUD Application designed to help with digital asset license management.
 
-All credentials are lcoated within a config.ini file that is not supplied in this git repository. 
-
-This is a learning exercise and should not be used as a production API service. 
-
-
+Visit this link for the [Design Specification Documenation:](https://1drv.ms/w/s!AhBJjeUDAfyAkRmQc9UC6ORDGx1_?e=HIxYsI)
