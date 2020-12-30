@@ -10,8 +10,20 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from jose import JWTError, jwt
 import configparser
 
+tags_metadata = [
+    {
+        "name": "token",
+        "description": "Operation with Users, create a token given a valid set of credentials.",
+    }
+]
+
 models.Base.metadata.create_all(bind=engine)
-app = FastAPI()
+app = FastAPI(
+    title="Scribe",
+    description="Scribe API back end service",
+    version="0.0.1",
+    openapi_tags=tags_metadata
+)
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -64,7 +76,7 @@ def get_current_user(
     return user
 
 
-@app.post("/token")
+@app.post("/token", tags=['token'])
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
@@ -87,10 +99,11 @@ async def login(
 
         token, expire = crud.create_access_token(data=data)
         return {
-            "jwt_token": token, 
+            "jwt_token": token,
             "token_type": "bearer",
             "refresh_token": "random_string",
-             "expires": expire}
+            "expires": expire,
+        }
 
     else:
         raise HTTPException(
@@ -110,6 +123,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
 
+
 @app.get("/refresh_token")
 async def get_refresh_token(refresh_token: str):
     """ Take an existing refresh token for a new JWT token, client stores refresh token """
@@ -128,7 +142,9 @@ def create_license(
     license: schemas.LicenseCreate,
     db: Session = Depends(get_db),
     current_user: schemas.User = Depends(get_current_user),
-    token: str = Depends(get_current_user)):
+    token: str = Depends(get_current_user),
+):
 
-    return crud.create_license(db=db, license=license, current_user=current_user)
-
+    return crud.create_license(
+        db=db, license=license, current_user=current_user
+    )

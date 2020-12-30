@@ -11,6 +11,7 @@ engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
+
 def override_get_db():
     try:
         db = TestingSessionLocal()
@@ -18,11 +19,13 @@ def override_get_db():
     finally:
         db.close()
 
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+TestingSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine
+)
 Base.metadata.create_all(bind=engine)
 app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
-
 
 
 def test_create_user():
@@ -30,27 +33,24 @@ def test_create_user():
 
     response = client.post(
         "/users/",
-        headers={'Content-Type': 'application/json'},
+        headers={"Content-Type": "application/json"},
         json={"email": "test@gmail.com", "password": "password"},
     )
 
     assert response.status_code == 200
 
+
 def test_fail_create_user_with_non_email():
     pass
+
 
 def test_fail_if_user_already_registered():
     """ If a user has been created with the same email address, deny access """
 
     response = client.post(
         "/users/",
-        headers={'Content-Type': 'application/json'},
+        headers={"Content-Type": "application/json"},
         json={"email": "test@gmail.com", "password": "password"},
     )
 
     assert response.status_code == 200
-
-
-
-
-    
