@@ -26,6 +26,7 @@ tags_metadata = [
 ]
 
 models.Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
     title="Scribe",
     description="Scribe API back end service",
@@ -109,7 +110,6 @@ async def login(
         return {
             "jwt_token": token,
             "token_type": "bearer",
-            "refresh_token": "random_string",
             "expires": expire,
         }
 
