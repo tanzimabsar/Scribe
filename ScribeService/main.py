@@ -13,7 +13,15 @@ import configparser
 tags_metadata = [
     {
         "name": "token",
-        "description": "Operation with Users, create a token given a valid set of credentials.",
+        "description": "Create a temporary JWT Token (Expiry in 30 Minutes) to use to authenticate.",
+    },
+    {
+        "name": "user",
+        "description": "Manage Users, create users and get information on the current user."
+    },
+    {
+        "name": "licenses",
+        "description": "Manage Licenses, create and list licenses for the current user"
     }
 ]
 
@@ -111,7 +119,7 @@ async def login(
         )
 
 
-@app.post("/users/", response_model=schemas.User)
+@app.post("/users/", response_model=schemas.User, tags=['user'])
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -119,25 +127,19 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@app.get("/users/me/", response_model=schemas.User)
+@app.get("/users/me/", response_model=schemas.User, tags=['user'])
 async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
 
 
-@app.get("/refresh_token")
-async def get_refresh_token(refresh_token: str):
-    """ Take an existing refresh token for a new JWT token, client stores refresh token """
-    pass
-
-
-@app.get("/licenses/")
+@app.get("/licenses/", tags=['licenses'])
 def get_licenses(
     db: Session = Depends(get_db), token: str = Depends(get_current_user)
 ):
     return crud.get_licenses(db)
 
 
-@app.post("/licenses/")
+@app.post("/licenses/", tags=['licenses'])
 def create_license(
     license: schemas.LicenseCreate,
     db: Session = Depends(get_db),

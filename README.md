@@ -8,6 +8,10 @@ The technical specification for this application is all outlined in the link bel
 
 [Design Specification Documenation](https://1drv.ms/w/s!AhBJjeUDAfyAkRmQc9UC6ORDGx1_?e=HIxYsI)
 
+The data model (SQL Tables) is located within the 'Scribe Data Model' file which should be opened using Draw.io. 
+
+[Draw IO](https://app.diagrams.net/)
+
 # Tests
 
 Tests are located within the test_client.py file where any new additions to the core business logic (ammended to service.py) are to be tested with the rest of the application. For testing purposes, a new SQLITE database is created and torn down after the tests have been completed. 
