@@ -9,6 +9,14 @@ from passlib.context import CryptContext
 from fastapi import Depends, FastAPI, HTTPException, status
 from jose import JWTError, jwt
 import configparser
+import logging 
+
+# setup loggers
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+
+# get root logger
+logger = logging.getLogger(__name__)  # the __name__ resolve to "main" since we are at the root of the project. 
+                                      # This will get the root logger since no logger in the configuration has this name.
 
 tags_metadata = [
     {
@@ -90,6 +98,7 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    logger.info("Returning Token")
 
     # Check if the username exists in the database
     db_user = crud.get_user_by_email(db, email=form_data.username)
@@ -103,10 +112,11 @@ async def login(
     password = crud.get_password(db, email=form_data.username)
 
     if verify_password(form_data.password, password):
+        
         # Return a jwt token with the username encoded in it
         data = {"username": form_data.username}
-
         token, expire = crud.create_access_token(data=data)
+
         return {
             "jwt_token": token,
             "token_type": "bearer",
@@ -119,7 +129,7 @@ async def login(
         )
 
 
-@app.post("/users/", response_model=schemas.User, tags=['user'])
+@app.post("/users", response_model=schemas.User, tags=['user'])
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -127,19 +137,19 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@app.get("/users/me/", response_model=schemas.User, tags=['user'])
+@app.get("/users/me", response_model=schemas.User, tags=['user'])
 async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
 
 
-@app.get("/licenses/", tags=['licenses'])
+@app.get("/licenses", tags=['licenses'])
 def get_licenses(
     db: Session = Depends(get_db), token: str = Depends(get_current_user)
 ):
     return crud.get_licenses(db)
 
 
-@app.post("/licenses/", tags=['licenses'])
+@app.post("/licenses", tags=['licenses'])
 def create_license(
     license: schemas.LicenseCreate,
     db: Session = Depends(get_db),

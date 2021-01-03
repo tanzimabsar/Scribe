@@ -36,7 +36,7 @@ def test_create_user():
     """ Assert that a user can successfully create a user profile with user and password """
 
     response = client.post(
-        "/users/",
+        "/users",
         headers={"Content-Type": "application/json"},
         json={
             "email": "test@gmail.com", 
@@ -50,7 +50,7 @@ def test_fail_if_user_is_already_created():
     """ Assert that a user can successfully create a user profile with user and password """
 
     response = client.post(
-        "/users/",
+        "/users",
         headers={"Content-Type": "application/json"},
         json={
             "email": "test@gmail.com", 
@@ -60,4 +60,17 @@ def test_fail_if_user_is_already_created():
 
     assert response.status_code == 400
 
+def test_get_token():
+
+
+    response = client.post(
+        "/token",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        json={
+            "username": "test_user", 
+            "password": "test"
+        }
+    )
+
+    assert response.status_code == 200
 
